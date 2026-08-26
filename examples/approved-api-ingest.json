@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "source": "Approved source",
+      "sourceUrl": "https://example.com/public-post/123",
+      "externalId": "123",
+      "title": "Looking for deformed bar supplier",
+      "body": "Need quotation for Grade 60 deformed bar in Quezon City. Contact: Juan Dela Cruz, 09171234567, purchasing@example.com",
+      "authorName": "Juan Dela Cruz",
+      "location": "Quezon City",
+      "publishedAt": "2026-08-26T08:00:00+08:00",
+      "isPublic": true
+    }
+  ]
+}

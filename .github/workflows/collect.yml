@@ -1,0 +1,35 @@
+name: Collect buyer inquiries
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+    inputs:
+      from:
+        description: Optional start date (YYYY-MM-DD)
+        required: false
+      to:
+        description: Optional end date (YYYY-MM-DD)
+        required: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run compliant public-source collection
+        env:
+          APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+          COLLECTOR_SECRET: ${{ secrets.COLLECTOR_SECRET }}
+          FROM_DATE: ${{ inputs.from }}
+          TO_DATE: ${{ inputs.to }}
+        run: |
+          payload="{}"
+          if [ -n "$FROM_DATE" ] || [ -n "$TO_DATE" ]; then
+            payload=$(printf '{"from":"%s","to":"%s"}' "$FROM_DATE" "$TO_DATE")
+          fi
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer $COLLECTOR_SECRET" \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "$APP_BASE_URL/api/collect"

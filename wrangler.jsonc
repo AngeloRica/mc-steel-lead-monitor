@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mc-steel-lead-monitor",
+  "main": "dist/server/index.js",
+  "compatibility_date": "2026-08-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "binding": "ASSETS", "directory": "dist/client" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mc-steel-lead-monitor",
+      "database_id": "5f12ca7e-068c-4e06-a2d3-de2305b8f827",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "vars": {
+    "ALLOWED_EMAILS": "angelonarcisorica16@gmail.com",
+    "ALLOW_LOCAL_DEV": "false",
+    "MAX_PAGES_PER_QUERY": "10",
+    "RSS_FEEDS": "[]"
+  }
+}
