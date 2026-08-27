@@ -13,7 +13,7 @@ test("accepts a clear English buyer request", () => {
 
 test("accepts a clear Filipino buyer request", () => {
   const result = assessBuyerIntent(
-    "Naghahanap ng steel plate supplier",
+    "Naghahanap ako ng steel plate supplier",
     "Pa-quote po for MS plate delivery to Manila.",
   );
   assert.equal(result.qualified, true);
@@ -73,4 +73,44 @@ test("still accepts a first-person buyer looking for a supplier", () => {
     "Need quotation and delivery to Pampanga.",
   );
   assert.equal(result.qualified, true);
+});
+
+test("accepts I'm looking for with Philippine evidence", () => {
+  const result = assessBuyerIntent(
+    "I'm looking for a deformed bar supplier",
+    "Please quote for delivery to Quezon City, Philippines.",
+  );
+  assert.equal(result.qualified, true);
+});
+
+test("accepts looking po ako in the Philippines", () => {
+  const result = assessBuyerIntent(
+    "Looking po ako for GI pipe",
+    "Please quote. Delivery to Cavite.",
+  );
+  assert.equal(result.qualified, true);
+});
+
+test("accepts please quote with a Philippine phone number", () => {
+  const result = assessBuyerIntent(
+    "Please quote steel grating",
+    "Contact 09171234567 for our project inquiry.",
+  );
+  assert.equal(result.qualified, true);
+});
+
+test("rejects generic looking-for text without a first-person buyer phrase", () => {
+  const result = assessBuyerIntent(
+    "Looking for quality angle bar in the Philippines",
+    "Affordable construction materials in stock.",
+  );
+  assert.equal(result.qualified, false);
+});
+
+test("rejects a clear buyer phrase without Philippine evidence", () => {
+  const result = assessBuyerIntent(
+    "I'm looking for a rebar supplier",
+    "Please quote for delivery to Texas, USA.",
+  );
+  assert.equal(result.qualified, false);
 });

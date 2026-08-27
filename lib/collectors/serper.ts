@@ -22,7 +22,25 @@ function quotedOr(values: readonly string[]): string {
 
 // Keep the provider-facing query below Google's practical search-term limit.
 // The full phrase list is still used later by the buyer-intent classifier.
-const SEARCH_INTENT_PHRASES = ["looking for", "need supplier", "rfq", "naghahanap"] as const;
+const SEARCH_INTENT_PHRASES = [
+  "I'm looking for",
+  "naghahanap ako",
+  "looking po ako",
+  "please quote",
+  "pa quote",
+  "rfq",
+] as const;
+
+const PH_SEARCH_HINTS = [
+  "Philippines",
+  "Metro Manila",
+  "Luzon",
+  "Cavite",
+  "Bulacan",
+  "Pampanga",
+  "Cebu",
+  "Davao",
+] as const;
 
 function productBatches(): string[][] {
   const output: string[][] = [];
@@ -70,9 +88,12 @@ function buildQueries(from: string, to: string): string[] {
       : `site:${domain}`,
   );
   const intent = quotedOr(SEARCH_INTENT_PHRASES);
+  const philippines = quotedOr(PH_SEARCH_HINTS);
   const dateWindow = `after:${from} before:${to}`;
   return productBatches().flatMap((products) =>
-    domainGroups.map((domain) => `${domain} ${intent} ${quotedOr(products)} ${dateWindow}`),
+    domainGroups.map(
+      (domain) => `${domain} ${intent} ${quotedOr(products)} ${philippines} ${dateWindow}`,
+    ),
   );
 }
 

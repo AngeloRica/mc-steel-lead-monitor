@@ -132,6 +132,12 @@ reel, and watch URL structures. Private-group, share, Marketplace, profile,
 story, photo, and unclear Facebook links are marked Not relevant and hidden
 from the default Buyer leads view.
 
+Buyer qualification uses a strict positive allowlist. A lead must contain a
+first-person or explicit quotation phrase such as "I'm looking for,"
+"Naghahanap ako," "Looking po ako," "Please quote," `LF:`, or `RFQ`; a
+monitored product keyword; and Philippine evidence such as a Philippine
+location, Filipino buyer wording, or a `+63`/`09` contact number.
+
 ## Data responsibility
 
 - Store only what is needed to answer a public buyer inquiry.
