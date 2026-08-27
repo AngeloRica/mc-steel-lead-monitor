@@ -23,7 +23,7 @@ export function LeadsDashboard() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [source, setSource] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [status, setStatus] = useState("active");
   const [order, setOrder] = useState("newest");
   const [from, setFrom] = useState(dateInput(30));
   const [to, setTo] = useState(dateInput(0));
@@ -58,7 +58,7 @@ export function LeadsDashboard() {
     const response = await fetch(`/api/leads/${id}/status`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: nextStatus }) });
     if (!response.ok) { setItems(previous); setError("The lead status could not be saved."); }
   }
-  function resetFilters() { setSearch(""); setSource("all"); setStatus("all"); setOrder("newest"); setFrom(dateInput(30)); setTo(dateInput(0)); }
+  function resetFilters() { setSearch(""); setSource("all"); setStatus("active"); setOrder("newest"); setFrom(dateInput(30)); setTo(dateInput(0)); }
 
   return (
     <main className="app-shell">
@@ -76,7 +76,7 @@ export function LeadsDashboard() {
           <label><span>From</span><Input type="date" value={from} onChange={(event) => setFrom(event.target.value)} /></label>
           <label><span>To</span><Input type="date" value={to} onChange={(event) => setTo(event.target.value)} /></label>
           <label><span>Source</span><Select value={source} onValueChange={setSource}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All sources</SelectItem>{sources.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></label>
-          <label><span>Status</span><Select value={status} onValueChange={setStatus}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All statuses</SelectItem>{STATUS_OPTIONS.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></label>
+          <label><span>Status</span><Select value={status} onValueChange={setStatus}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="active">Buyer leads</SelectItem><SelectItem value="all">All including excluded</SelectItem>{STATUS_OPTIONS.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></label>
           <label><span>Order</span><Select value={order} onValueChange={setOrder}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="newest">Newest first</SelectItem><SelectItem value="oldest">Oldest first</SelectItem></SelectContent></Select></label>
           <Button variant="outline" onClick={resetFilters}><FilterX /> Reset</Button>
         </section>

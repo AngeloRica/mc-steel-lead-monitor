@@ -9,6 +9,7 @@ A GitHub-ready, private monitoring dashboard for construction-material buyer inq
 - Separate Contacts page for explicitly published name, email, and Philippine mobile number.
 - Contact review states: Unreviewed, Verified, Invalid, and Do not contact.
 - Buyer-intent scoring for English and Filipino phrases.
+- Strict seller-ad rejection: promotional offers, stock advertisements, delivery pitches, and "message us" sales posts are excluded even when they contain buyer-like wording.
 - Construction keywords covering rebars, steel sections, plates, tubes, pipes, mesh, roofing, bolts, and related products.
 - Duplicate protection based on the original post URL.
 - Hourly rotating collection from 8:07 AM through 6:07 PM Philippine time, with up to 20 public search results per run and manual runs available anytime.

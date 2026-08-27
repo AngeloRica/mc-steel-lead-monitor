@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, like, lte, or, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, like, lte, ne, or, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { contacts, leads } from "@/db/schema";
 import { authorizeViewer } from "@/lib/auth";
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const offset = Math.max(0, Number(url.searchParams.get("offset") ?? "0") || 0);
   const limit = Math.min(500, Math.max(1, Number(url.searchParams.get("limit") ?? "250") || 250));
 
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [ne(leads.status, "not_relevant")];
   if (source && source !== "all") conditions.push(eq(leads.source, source));
   if (reviewStatus && reviewStatus !== "all") conditions.push(eq(contacts.reviewStatus, reviewStatus));
   if (from) conditions.push(gte(leads.publishedAt, new Date(`${from}T00:00:00+08:00`).toISOString()));

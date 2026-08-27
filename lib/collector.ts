@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, asc, eq, gt, inArray } from "drizzle-orm";
 import { collectionRuns, contacts, leads } from "@/db/schema";
 import { getDb } from "@/db";
 import { collectFromRss } from "@/lib/collectors/rss";
@@ -78,11 +78,40 @@ export async function ingestCandidates(candidates: LeadCandidate[]): Promise<Col
   return { fetchedCount: candidates.length, qualifiedCount, insertedCount };
 }
 
+async function quarantineExistingOfferingPosts(): Promise<void> {
+  const db = getDb();
+  let lastId = 0;
+
+  while (true) {
+    const rows = await db
+      .select({ id: leads.id, title: leads.title, body: leads.body })
+      .from(leads)
+      .where(and(eq(leads.status, "new"), gt(leads.id, lastId)))
+      .orderBy(asc(leads.id))
+      .limit(500);
+
+    if (!rows.length) break;
+    const offeringIds = rows
+      .filter((row) => !assessBuyerIntent(row.title, row.body).qualified)
+      .map((row) => row.id);
+
+    if (offeringIds.length) {
+      await db
+        .update(leads)
+        .set({ status: "not_relevant" })
+        .where(inArray(leads.id, offeringIds));
+    }
+
+    lastId = rows[rows.length - 1].id;
+  }
+}
+
 export async function runCollection(from: string, to: string): Promise<CollectionSummary> {
   const db = getDb();
   const [run] = await db.insert(collectionRuns).values({}).returning({ id: collectionRuns.id });
 
   try {
+    await quarantineExistingOfferingPosts();
     const [searchCandidates, rssCandidates] = await Promise.all([
       collectFromPublicSearch(from, to),
       collectFromRss(),

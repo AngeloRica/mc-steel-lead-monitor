@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, like, lte, or, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, like, lte, ne, or, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { leads } from "@/db/schema";
 import { authorizeViewer } from "@/lib/auth";
@@ -28,7 +28,8 @@ export async function GET(request: Request) {
 
   const conditions: SQL[] = [];
   if (source && source !== "all") conditions.push(eq(leads.source, source));
-  if (status && status !== "all") conditions.push(eq(leads.status, status));
+  if (!status || status === "active") conditions.push(ne(leads.status, "not_relevant"));
+  else if (status !== "all") conditions.push(eq(leads.status, status));
   if (from) conditions.push(gte(leads.publishedAt, new Date(`${from}T00:00:00+08:00`).toISOString()));
   if (to) conditions.push(lte(leads.publishedAt, new Date(`${to}T23:59:59+08:00`).toISOString()));
   if (search) {
