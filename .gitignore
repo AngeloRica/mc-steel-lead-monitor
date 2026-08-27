@@ -44,3 +44,5 @@ next-env.d.ts
 MC-Steel-No-Card-Update/
 no-card-backup-*/
 .vscode/
+MC-Steel-Serper-Fix-Update/
+serper-fix-backup-*/

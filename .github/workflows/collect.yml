@@ -2,7 +2,9 @@ name: Collect buyer inquiries
 
 on:
   schedule:
-    - cron: "7,22,37,52 * * * *"
+    # Hourly from 08:07 through 18:07 Asia/Manila (00:07-10:07 UTC).
+    # Each run rotates to one search segment and retrieves up to 20 results.
+    - cron: "7 0-10 * * *"
   workflow_dispatch:
     inputs:
       from:

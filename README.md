@@ -11,7 +11,7 @@ A GitHub-ready, private monitoring dashboard for construction-material buyer inq
 - Buyer-intent scoring for English and Filipino phrases.
 - Construction keywords covering rebars, steel sections, plates, tubes, pipes, mesh, roofing, bolts, and related products.
 - Duplicate protection based on the original post URL.
-- Scheduled GitHub Actions collection every 15 minutes.
+- Hourly rotating collection from 8:07 AM through 6:07 PM Philippine time, with up to 20 public search results per run and manual runs available anytime.
 - Pluggable inputs: public web-search results, RSS/Atom feeds, and approved API/webhook ingestion.
 - Built-in HTTPS username/password protection with no Cloudflare Zero Trust subscription required.
 
@@ -21,7 +21,7 @@ This project does not bypass logins, CAPTCHAs, robots controls, or platform anti
 
 ## Architecture
 
-1. GitHub Actions calls `/api/collect` every 15 minutes.
+1. GitHub Actions calls `/api/collect` hourly from 8:07 AM through 6:07 PM Philippine time, or on demand when manually started.
 2. The collector queries configured public sources and RSS feeds.
 3. Buyer-intent scoring keeps posts containing both a buying signal and a construction-product match.
 4. D1 stores leads without a lifetime row cap and ignores duplicate post URLs.
@@ -92,7 +92,7 @@ Add these in **Settings → Secrets and variables → Actions**:
 | `APP_BASE_URL` | Deployed dashboard origin, without trailing slash |
 | `COLLECTOR_SECRET` | Long random secret matching the Worker secret |
 
-After pushing to `main`, `deploy.yml` deploys the application. `collect.yml` runs monitoring at minute 7, 22, 37, and 52 to avoid the top-of-hour GitHub Actions rush.
+After pushing to `main`, `deploy.yml` deploys the application. `collect.yml` runs hourly from 8:07 AM through 6:07 PM Philippine time and can also be started manually. Each run rotates to one of the configured product/platform search segments so the trial credit balance is not consumed by a complete scan every hour.
 
 ## Collection sources
 

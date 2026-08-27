@@ -1,5 +1,4 @@
 import {
-  BUYER_INTENT_PHRASES,
   DEFAULT_PLATFORM_DOMAINS,
   PRODUCT_KEYWORDS,
 } from "@/config/monitor";
@@ -20,6 +19,10 @@ type SerperResponse = {
 function quotedOr(values: readonly string[]): string {
   return `(${values.map((value) => `"${value}"`).join(" OR ")})`;
 }
+
+// Keep the provider-facing query below Google's practical search-term limit.
+// The full phrase list is still used later by the buyer-intent classifier.
+const SEARCH_INTENT_PHRASES = ["looking for", "need supplier", "rfq", "naghahanap"] as const;
 
 function productBatches(): string[][] {
   const output: string[][] = [];
@@ -60,22 +63,28 @@ function relativeDate(value: string | undefined, now = new Date()): string {
 
 function buildQueries(from: string, to: string): string[] {
   const domainGroups = DEFAULT_PLATFORM_DOMAINS.map((domain) => `site:${domain}`);
-  const intent = quotedOr(BUYER_INTENT_PHRASES);
+  const intent = quotedOr(SEARCH_INTENT_PHRASES);
   const dateWindow = `after:${from} before:${to}`;
   return productBatches().flatMap((products) =>
     domainGroups.map((domain) => `${domain} ${intent} ${quotedOr(products)} ${dateWindow}`),
   );
 }
 
+function hourlyQuery(queries: string[], now = new Date()): string[] {
+  if (!queries.length) return [];
+  const hourSlot = Math.floor(now.getTime() / 3_600_000);
+  return [queries[hourSlot % queries.length]];
+}
+
 export async function collectFromPublicSearch(from: string, to: string): Promise<LeadCandidate[]> {
   const runtime = getRuntimeEnv();
   if (!runtime.SERPER_API_KEY) return [];
 
-  const maxPages = Math.max(1, Number(runtime.MAX_PAGES_PER_QUERY ?? "10") || 10);
+  const maxPages = Math.max(1, Number(runtime.MAX_PAGES_PER_QUERY ?? "2") || 2);
   const candidates: LeadCandidate[] = [];
   const seen = new Set<string>();
 
-  for (const query of buildQueries(from, to)) {
+  for (const query of hourlyQuery(buildQueries(from, to))) {
     for (let page = 1; page <= maxPages; page += 1) {
       const response = await fetch("https://google.serper.dev/search", {
         method: "POST",
@@ -83,10 +92,13 @@ export async function collectFromPublicSearch(from: string, to: string): Promise
           "content-type": "application/json",
           "x-api-key": runtime.SERPER_API_KEY,
         },
-        body: JSON.stringify({ q: query, page, num: 100, gl: "ph", hl: "en" }),
+        body: JSON.stringify({ q: query, page, num: 10, gl: "ph", hl: "en" }),
       });
       if (!response.ok) {
-        throw new Error(`Search provider returned ${response.status}.`);
+        const detail = (await response.text()).replace(/\s+/g, " ").trim().slice(0, 300);
+        throw new Error(
+          `Search provider returned ${response.status}${detail ? `: ${detail}` : "."}`,
+        );
       }
 
       const payload = (await response.json()) as SerperResponse;
