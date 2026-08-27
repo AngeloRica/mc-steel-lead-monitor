@@ -98,7 +98,9 @@ After pushing to `main`, `deploy.yml` deploys the application. `collect.yml` run
 
 ### Public web search
 
-Set `SERPER_API_KEY`. Queries use construction product batches, buyer-intent phrases, Philippine search localization, date windows, and `site:` filters for configured platforms. Edit `config/monitor.ts` to change products, intent phrases, platforms, or locations.
+Set `SERPER_API_KEY`. Queries use construction product batches, buyer-intent phrases, Philippine search localization, date windows, and `site:` filters for Facebook, Instagram, Threads, TikTok, LinkedIn, and Reddit. Edit `config/monitor.ts` to change products, intent phrases, platforms, or locations.
+
+Social-platform coverage is limited to public pages that the search provider has indexed. The collector does not access private accounts, login-only content, or content hidden from search engines.
 
 `MAX_PAGES_PER_QUERY` is only an operational budget for one scheduled run. It is not a database or display limit. Repeated scheduled runs keep accumulating unique posts.
 

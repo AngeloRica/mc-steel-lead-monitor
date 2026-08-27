@@ -54,6 +54,8 @@ export const SELLER_ONLY_PHRASES = [
 
 export const DEFAULT_PLATFORM_DOMAINS = [
   "facebook.com",
+  "instagram.com",
+  "threads.com",
   "tiktok.com",
   "linkedin.com",
   "reddit.com",

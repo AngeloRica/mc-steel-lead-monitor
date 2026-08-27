@@ -35,6 +35,8 @@ function productBatches(): string[][] {
 function sourceFromUrl(url: string): string {
   const hostname = new URL(url).hostname.replace(/^www\./, "");
   if (hostname.includes("facebook.com")) return "Facebook";
+  if (hostname.includes("instagram.com")) return "Instagram";
+  if (hostname.includes("threads.com")) return "Threads";
   if (hostname.includes("tiktok.com")) return "TikTok";
   if (hostname.includes("linkedin.com")) return "LinkedIn";
   if (hostname.includes("reddit.com")) return "Reddit";
