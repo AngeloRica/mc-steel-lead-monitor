@@ -127,6 +127,11 @@ curl --request POST \
 
 Each item must set `isPublic: true`. The server still applies buyer-intent qualification and contact extraction.
 
+Facebook results are additionally restricted to clearly public post, video,
+reel, and watch URL structures. Private-group, share, Marketplace, profile,
+story, photo, and unclear Facebook links are marked Not relevant and hidden
+from the default Buyer leads view.
+
 ## Data responsibility
 
 - Store only what is needed to answer a public buyer inquiry.

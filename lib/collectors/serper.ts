@@ -64,7 +64,11 @@ function relativeDate(value: string | undefined, now = new Date()): string {
 }
 
 function buildQueries(from: string, to: string): string[] {
-  const domainGroups = DEFAULT_PLATFORM_DOMAINS.map((domain) => `site:${domain}`);
+  const domainGroups = DEFAULT_PLATFORM_DOMAINS.map((domain) =>
+    domain === "facebook.com"
+      ? "site:facebook.com -inurl:groups -inurl:share -inurl:marketplace"
+      : `site:${domain}`,
+  );
   const intent = quotedOr(SEARCH_INTENT_PHRASES);
   const dateWindow = `after:${from} before:${to}`;
   return productBatches().flatMap((products) =>

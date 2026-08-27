@@ -5,6 +5,7 @@ import { collectFromRss } from "@/lib/collectors/rss";
 import { collectFromPublicSearch } from "@/lib/collectors/serper";
 import { extractExplicitPublicContacts } from "@/lib/contact-extractor";
 import { assessBuyerIntent } from "@/lib/intent";
+import { isLikelyPublicSourceUrl } from "@/lib/source-access";
 import type { LeadCandidate } from "@/lib/types";
 
 type CollectionSummary = {
@@ -34,7 +35,11 @@ export async function ingestCandidates(candidates: LeadCandidate[]): Promise<Col
   let insertedCount = 0;
 
   for (const candidate of candidates) {
-    if (!candidate.isPublic || !validHttpUrl(candidate.sourceUrl)) continue;
+    if (
+      !candidate.isPublic ||
+      !validHttpUrl(candidate.sourceUrl) ||
+      !isLikelyPublicSourceUrl(candidate.sourceUrl)
+    ) continue;
     const assessment = assessBuyerIntent(candidate.title, candidate.body);
     if (!assessment.qualified) continue;
     qualifiedCount += 1;
@@ -84,7 +89,7 @@ async function quarantineExistingOfferingPosts(): Promise<void> {
 
   while (true) {
     const rows = await db
-      .select({ id: leads.id, title: leads.title, body: leads.body })
+      .select({ id: leads.id, title: leads.title, body: leads.body, sourceUrl: leads.sourceUrl })
       .from(leads)
       .where(and(eq(leads.status, "new"), gt(leads.id, lastId)))
       .orderBy(asc(leads.id))
@@ -92,7 +97,11 @@ async function quarantineExistingOfferingPosts(): Promise<void> {
 
     if (!rows.length) break;
     const offeringIds = rows
-      .filter((row) => !assessBuyerIntent(row.title, row.body).qualified)
+      .filter(
+        (row) =>
+          !assessBuyerIntent(row.title, row.body).qualified ||
+          !isLikelyPublicSourceUrl(row.sourceUrl),
+      )
       .map((row) => row.id);
 
     if (offeringIds.length) {
