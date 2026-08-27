@@ -42,3 +42,35 @@ test("rejects direct-supplier promotions containing buyer keywords", () => {
   );
   assert.equal(result.qualified, false);
 });
+
+test("rejects a shortened are-you-looking advertisement", () => {
+  const result = assessBuyerIntent(
+    "Are you looking for GI pipe?",
+    "Quality construction materials at competitive prices.",
+  );
+  assert.equal(result.qualified, false);
+});
+
+test("rejects an ungrammatical we-offering advertisement", () => {
+  const result = assessBuyerIntent(
+    "Looking for MS plate?",
+    "We offering steel plate and delivery in Metro Manila.",
+  );
+  assert.equal(result.qualified, false);
+});
+
+test("rejects a we-can-provide seller advertisement", () => {
+  const result = assessBuyerIntent(
+    "Need construction materials?",
+    "We can provide angle bar, flat bar, and deformed bar.",
+  );
+  assert.equal(result.qualified, false);
+});
+
+test("still accepts a first-person buyer looking for a supplier", () => {
+  const result = assessBuyerIntent(
+    "We are looking for a wide flange supplier",
+    "Need quotation and delivery to Pampanga.",
+  );
+  assert.equal(result.qualified, true);
+});
